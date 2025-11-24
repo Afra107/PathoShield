@@ -1,0 +1,31 @@
+FYP_Project/
+│
+├── client/                          # React Frontend (Vite)
+│   ├── src/
+│   │   ├── App.jsx                  # Main React component
+│   │   ├── App.css                  # Component styles
+│   │   ├── main.jsx                  # React entry point
+│   │   └── index.css                # Global styles
+│   ├── Dockerfile                    # Frontend Docker image
+│   ├── nginx.conf                    # Nginx configuration
+│   ├── package.json                  # Node.js dependencies
+│   ├── vite.config.js               # Vite configuration
+│   ├── index.html                   # HTML template
+│   ├── .eslintrc.cjs                # ESLint configuration
+│   └── .gitignore                   # Git ignore rules
+│
+├── server/                          # FastAPI Backend
+│   ├── main.py                      # FastAPI application & routes
+│   ├── requirements.txt             # Python dependencies
+│   ├── Dockerfile                   # Backend Docker image
+│   ├── __init__.py                  # Python package marker
+│   └── .gitignore                   # Git ignore rules
+│
+├── docker-compose.yml               # Docker orchestration (client, server, MongoDB)
+├── env.example                      # Environment variables template
+├── .dockerignore                    # Docker ignore rules
+├── .gitignore                       # Root Git ignore rules
+├── README.md                        # Project documentation
+└── PROJECT_TREE.txt                # This file
+
+
