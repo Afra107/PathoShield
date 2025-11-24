@@ -14,6 +14,8 @@ const Footer = () => {
             </p>
           </div>
 
+          <div></div>
+
           {/* Links Section */}
           <div>
             <h3 className="text-white font-semibold mb-4">Quick Links</h3>
@@ -48,13 +50,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact Section */}
-          <div>
-            <h3 className="text-white font-semibold mb-4">Contact</h3>
-            <p className="text-sm">
-              For support and inquiries, please contact the development team.
-            </p>
-          </div>
         </div>
 
         {/* Copyright */}
