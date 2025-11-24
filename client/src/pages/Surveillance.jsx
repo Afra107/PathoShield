@@ -4,28 +4,28 @@ import Button from '../components/Button'
 const Surveillance = () => {
   const surveillanceData = [
     {
-      region: 'North America',
+      region: 'Punjab',
       resistanceRate: '23.5%',
       trend: 'up',
       organisms: 12,
       lastUpdated: '2024-01-15',
     },
     {
-      region: 'Europe',
+      region: 'Sindh',
       resistanceRate: '18.2%',
       trend: 'down',
       organisms: 15,
       lastUpdated: '2024-01-14',
     },
     {
-      region: 'Asia',
+      region: 'KPK',
       resistanceRate: '31.8%',
       trend: 'up',
       organisms: 18,
       lastUpdated: '2024-01-15',
     },
     {
-      region: 'South America',
+      region: 'Balochistan',
       resistanceRate: '27.3%',
       trend: 'stable',
       organisms: 10,
@@ -87,7 +87,7 @@ const Surveillance = () => {
             <div className="text-sm text-neutral-600">Avg Resistance Rate</div>
           </Card>
           <Card variant="elevated" padding="md">
-            <div className="text-2xl font-bold text-neutral-600 mb-1">12</div>
+            <div className="text-2xl font-bold text-neutral-600 mb-1">6</div>
             <div className="text-sm text-neutral-600">Active Regions</div>
           </Card>
         </div>
