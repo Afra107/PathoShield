@@ -5,6 +5,7 @@ import Footer from './components/Footer'
 import Home from './pages/Home'
 import Prediction from './pages/Prediction'
 import Surveillance from './pages/Surveillance'
+import EPrescription from './pages/EPrescription'
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/prediction" element={<Prediction />} />
               <Route path="/surveillance" element={<Surveillance />} />
+              <Route path="/eprescription" element={<EPrescription />} />
             </Routes>
           </main>
           <Footer />

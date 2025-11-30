@@ -8,21 +8,28 @@ const Home = () => {
       icon: '🔬',
       title: 'AMR Prediction',
       description: 'Predict antimicrobial resistance based on genomic data and clinical information.',
-      link: '/prediction',
+      link: '/prediction#top',
+      color: 'primary',
+    },
+    {
+      icon: '💊',
+      title: 'E-Prescription',
+      description: 'Generate electronic prescriptions based on AMR prediction results with recommended antibiotics.',
+      link: '/prediction#eprescription',
       color: 'primary',
     },
     {
       icon: '📊',
       title: 'Surveillance',
       description: 'Monitor resistance patterns and trends across different regions and time periods.',
-      link: '/surveillance',
+      link: '/surveillance#top',
       color: 'secondary',
     },
     {
       icon: '📈',
       title: 'Analytics',
       description: 'Analyze resistance data and generate comprehensive reports for research.',
-      link: '/surveillance',
+      link: '/surveillance#charts',
       color: 'accent',
     },
   ]
@@ -68,7 +75,7 @@ const Home = () => {
         <h2 className="text-3xl md:text-4xl font-bold text-center text-neutral-900 mb-12">
           Key Features
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {features.map((feature, index) => (
             <Card
               key={index}
