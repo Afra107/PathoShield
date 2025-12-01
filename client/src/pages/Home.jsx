@@ -14,7 +14,7 @@ const Home = () => {
     {
       icon: '💊',
       title: 'E-Prescription',
-      description: 'Generate electronic prescriptions based on AMR prediction results with recommended antibiotics.',
+      description: 'Generate e-prescriptions using AMR predictions with recommended antibiotics.',
       link: '/prediction#eprescription',
       color: 'primary',
     },

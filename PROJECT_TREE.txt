@@ -2,30 +2,55 @@ FYP_Project/
 │
 ├── client/                          # React Frontend (Vite)
 │   ├── src/
-│   │   ├── App.jsx                  # Main React component
-│   │   ├── App.css                  # Component styles
-│   │   ├── main.jsx                  # React entry point
-│   │   └── index.css                # Global styles
-│   ├── Dockerfile                    # Frontend Docker image
-│   ├── nginx.conf                    # Nginx configuration
-│   ├── package.json                  # Node.js dependencies
+│   │   ├── pages/                   # Page components
+│   │   │   ├── Home.jsx            # Landing page
+│   │   │   ├── Prediction.jsx      # AMR Prediction page
+│   │   │   ├── Surveillance.jsx    # Surveillance dashboard
+│   │   │   └── EPrescription.jsx   # E-Prescription module
+│   │   ├── components/              # Reusable components
+│   │   │   ├── AntibioticSuggestionList.jsx  # Antibiotic recommendations
+│   │   │   ├── Button.jsx          # Button component
+│   │   │   ├── Card.jsx            # Card container component
+│   │   │   ├── FileDrop.jsx        # File upload component
+│   │   │   ├── Footer.jsx          # Footer component
+│   │   │   ├── Header.jsx          # Header with navigation
+│   │   │   ├── IconButton.jsx      # Icon button component
+│   │   │   ├── Input.jsx           # Form input component
+│   │   │   ├── OrganismDistributionChart.jsx  # Organism distribution chart
+│   │   │   ├── PakistanMap.jsx     # Interactive Pakistan map
+│   │   │   ├── PrescriptionForm.jsx # Prescription form component
+│   │   │   ├── PrescriptionSummary.jsx  # Prescription summary modal
+│   │   │   ├── RegionDetailsPanel.jsx  # Region details panel
+│   │   │   ├── ResistanceTrendChart.jsx # Resistance trend chart
+│   │   │   ├── ResistanceTrendsChart.jsx # Resistance trends chart
+│   │   │   └── index.js            # Component exports
+│   │   ├── theme/                   # Theme configuration
+│   │   │   └── ThemeProvider.jsx   # Theme provider component
+│   │   ├── App.jsx                  # Main React component with routing
+│   │   ├── main.jsx                 # React entry point
+│   │   └── index.css                # Global styles with print media queries
+│   ├── Dockerfile                   # Production Docker image
+│   ├── Dockerfile.dev               # Development Docker image
+│   ├── nginx.conf                   # Nginx configuration
+│   ├── package.json                 # Node.js dependencies
 │   ├── vite.config.js               # Vite configuration
+│   ├── tailwind.config.js           # Tailwind CSS configuration
+│   ├── postcss.config.js            # PostCSS configuration
 │   ├── index.html                   # HTML template
-│   ├── .eslintrc.cjs                # ESLint configuration
-│   └── .gitignore                   # Git ignore rules
+│   └── server/                      # Temporary data folder
+│       └── app/
+│           └── data/
+│               └── regions.json     # Region data (if needed)
 │
 ├── server/                          # FastAPI Backend
-│   ├── main.py                      # FastAPI application & routes
+│   ├── main.py                      # FastAPI application & API routes
 │   ├── requirements.txt             # Python dependencies
 │   ├── Dockerfile                   # Backend Docker image
 │   ├── __init__.py                  # Python package marker
-│   └── .gitignore                   # Git ignore rules
+│   └── models/                      # ML models directory (placeholder)
 │
 ├── docker-compose.yml               # Docker orchestration (client, server, MongoDB)
 ├── env.example                      # Environment variables template
-├── .dockerignore                    # Docker ignore rules
-├── .gitignore                       # Root Git ignore rules
+├── .gitignore                       # Git ignore rules
 ├── README.md                        # Project documentation
-└── PROJECT_TREE.txt                # This file
-
-
+└── PROJECT_TREE.txt                 # This file

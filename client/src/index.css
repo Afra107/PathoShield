@@ -93,6 +93,54 @@
   nav {
     display: none !important;
   }
+
+  /* Ensure prescription summary modal is visible and properly styled for print */
+  .print\:static {
+    position: static !important;
+  }
+
+  .print\:block {
+    display: block !important;
+  }
+
+  .print\:inset-auto {
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+  }
+
+  /* Force hide all EPrescription page content during print */
+  /* Hide the main container that wraps the page content */
+  .no-print,
+  .print\:hidden,
+  div.print\:hidden,
+  div[class*="print:hidden"],
+  [class*="print:hidden"] {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Hide main app container during print - only show modal */
+  main > div > div.print\:hidden,
+  main > div > div[class*="print:hidden"] {
+    display: none !important;
+  }
+
+  /* Ensure only the prescription modal is visible */
+  /* The modal should have print:static and print:block classes */
+  div[class*="print:static"][class*="print:block"],
+  div.print\:static.print\:block {
+    display: block !important;
+    position: static !important;
+    visibility: visible !important;
+  }
+
+  /* Make sure modal content is visible */
+  div[class*="print:static"] .print\:bg-white {
+    background: white !important;
+    display: block !important;
+  }
 }
 
 

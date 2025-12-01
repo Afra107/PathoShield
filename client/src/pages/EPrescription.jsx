@@ -97,8 +97,9 @@ const EPrescription = () => {
   const { bacterialSpecies, susceptibleAntibiotics, resistantAntibiotics, region } = predictionData
 
   return (
-    <div className="min-h-screen bg-neutral-50 py-8">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+    <>
+      <div className="min-h-screen bg-neutral-50 py-8 print:hidden no-print">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         {/* Page Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
@@ -188,16 +189,18 @@ const EPrescription = () => {
           </div>
         </Card>
 
-        {/* Prescription Summary Modal */}
-        {prescription && (
-          <PrescriptionSummary
-            prescription={prescription}
-            onClose={handleCloseSummary}
-            onPrint={handlePrint}
-          />
-        )}
+        </div>
       </div>
-    </div>
+
+      {/* Prescription Summary Modal - Rendered outside print:hidden container */}
+      {prescription && (
+        <PrescriptionSummary
+          prescription={prescription}
+          onClose={handleCloseSummary}
+          onPrint={handlePrint}
+        />
+      )}
+    </>
   )
 }
 

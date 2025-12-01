@@ -8,18 +8,42 @@ A full-stack web application for predicting and monitoring Antimicrobial Resista
 FYP_Project/
 ├── client/                 # React frontend (Vite)
 │   ├── src/
-│   │   ├── App.jsx        # Main app component
-│   │   ├── App.css        # App styles
+│   │   ├── pages/         # Page components
+│   │   │   ├── Home.jsx            # Landing page
+│   │   │   ├── Prediction.jsx      # AMR Prediction page
+│   │   │   ├── Surveillance.jsx    # Surveillance dashboard
+│   │   │   └── EPrescription.jsx   # E-Prescription module
+│   │   ├── components/    # Reusable components
+│   │   │   ├── AntibioticSuggestionList.jsx
+│   │   │   ├── Button.jsx
+│   │   │   ├── Card.jsx
+│   │   │   ├── FileDrop.jsx
+│   │   │   ├── Footer.jsx
+│   │   │   ├── Header.jsx
+│   │   │   ├── IconButton.jsx
+│   │   │   ├── Input.jsx
+│   │   │   ├── OrganismDistributionChart.jsx
+│   │   │   ├── PakistanMap.jsx
+│   │   │   ├── PrescriptionForm.jsx
+│   │   │   ├── PrescriptionSummary.jsx
+│   │   │   ├── RegionDetailsPanel.jsx
+│   │   │   └── ResistanceTrendsChart.jsx
+│   │   ├── theme/         # Theme configuration
+│   │   │   └── ThemeProvider.jsx
+│   │   ├── App.jsx        # Main app component with routing
 │   │   ├── main.jsx       # Entry point
 │   │   └── index.css      # Global styles
 │   ├── package.json
 │   ├── vite.config.js
+│   ├── tailwind.config.js
 │   ├── Dockerfile
+│   ├── Dockerfile.dev
 │   └── nginx.conf
 ├── server/                 # FastAPI backend
-│   ├── main.py            # FastAPI application
+│   ├── main.py            # FastAPI application & API routes
 │   ├── requirements.txt   # Python dependencies
-│   └── Dockerfile
+│   ├── Dockerfile
+│   └── models/            # ML models directory
 ├── docker-compose.yml     # Docker orchestration
 ├── env.example            # Environment variables template
 └── README.md
@@ -148,6 +172,9 @@ Open http://localhost:5173 in your browser. The status card should show "Backend
 
 ### Surveillance
 - `GET /api/surveillance` - Get surveillance data
+- `GET /api/surveillance/regions` - Get regional surveillance data with geographic coordinates
+- `GET /api/surveillance/trends` - Get resistance trends over time (12 months)
+- `GET /api/surveillance/organisms` - Get organism distribution data (4 species)
 
 ### API Documentation
 - Interactive docs: http://localhost:8000/docs
@@ -204,10 +231,36 @@ docker-compose logs -f server
 2. **Backend**: Add routes in `server/main.py` or create separate router modules
 3. **Database**: Collections are created automatically on first use
 
+## ✨ Features
+
+### Frontend Features
+- **AMR Prediction**: Upload mass spectrometry data, enter clinical information, and get resistance predictions
+- **E-Prescription Module**: Generate electronic prescriptions based on prediction results with:
+  - Antibiotic recommendations (sorted by safety, usage, first-line preference)
+  - Resistant antibiotic warnings
+  - Prescription form with dosage, duration, and instructions
+  - Print-ready prescription summary (single page PDF)
+- **Surveillance Dashboard**: 
+  - Interactive Pakistan map with regional resistance markers
+  - Resistance trends over time (line charts)
+  - Organism distribution charts (bar charts)
+  - Regional data tables and details panels
+- **Responsive Design**: Mobile-friendly UI with Tailwind CSS
+- **Theme System**: Consistent design system with customizable colors
+
+### Backend Features
+- RESTful API with FastAPI
+- MongoDB integration for data persistence
+- Health check endpoints
+- CORS configuration for frontend communication
+- Mock data endpoints for development/testing
+
 ## 📝 Notes
 
 - The app includes CORS middleware configured for local development
 - MongoDB connection is optional - the app will run without it but with limited functionality
 - All services are connected via Docker network `amr_network`
 - Health checks are configured for MongoDB and server services
+- E-Prescription print layout is optimized for single-page A4 printing
+- The surveillance dashboard uses Leaflet maps and Recharts for data visualization
 
