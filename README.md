@@ -1,8 +1,8 @@
 # AMR Prediction & Surveillance Web App
 
-A full-stack web application for predicting and monitoring Antimicrobial Resistance (AMR) patterns. Built with React (Vite), FastAPI, and MongoDB.
+A full-stack web application for predicting and monitoring Antimicrobial Resistance (AMR) patterns using Deep Learning. It provides a comprehensive interface for AMR predictions, electronic prescription generation and interactive regional surveillance; built with React (Vite), FastAPI, and MongoDB.
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 FYP_Project/
@@ -49,7 +49,7 @@ FYP_Project/
 └── README.md
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -140,7 +140,7 @@ Run MongoDB locally or use Docker:
 docker run -d -p 27017:27017 --name mongodb mongo:7.0
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Test Backend Health
 
@@ -161,7 +161,7 @@ Expected response:
 
 Open http://localhost:5173 in your browser. The status card should show "Backend is healthy" if the connection is successful.
 
-## 📡 API Endpoints
+## API Endpoints
 
 ### Health Check
 - `GET /health` - Check backend and database status
@@ -180,7 +180,7 @@ Open http://localhost:5173 in your browser. The status card should show "Backend
 - Interactive docs: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
 
-## 🔧 Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -192,7 +192,7 @@ Copy `env.example` to `.env` and configure:
 - `SECRET_KEY`: Secret key for security (change in production!)
 - `VITE_API_URL`: Frontend API URL (default: `http://localhost:8000`)
 
-## 🐳 Docker Commands
+## Docker Commands
 
 ```bash
 # Start all services
@@ -217,13 +217,13 @@ docker-compose logs -f
 docker-compose logs -f server
 ```
 
-## 📦 Services
+## Services
 
 - **Client**: React app served via Nginx on port 5173
 - **Server**: FastAPI backend on port 8000
 - **MongoDB**: Database on port 27017
 
-## 🛠️ Development
+## Development
 
 ### Adding New Features
 
@@ -231,7 +231,7 @@ docker-compose logs -f server
 2. **Backend**: Add routes in `server/main.py` or create separate router modules
 3. **Database**: Collections are created automatically on first use
 
-## ✨ Features
+## Features
 
 ### Frontend Features
 - **AMR Prediction**: Upload mass spectrometry data, enter clinical information, and get resistance predictions
@@ -255,7 +255,7 @@ docker-compose logs -f server
 - CORS configuration for frontend communication
 - Mock data endpoints for development/testing
 
-## 📝 Notes
+## Notes
 
 - The app includes CORS middleware configured for local development
 - MongoDB connection is optional - the app will run without it but with limited functionality
