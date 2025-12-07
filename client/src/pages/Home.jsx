@@ -16,7 +16,7 @@ const Home = () => {
       title: 'E-Prescription',
       description: 'Generate e-prescriptions using AMR predictions with recommended antibiotics.',
       link: '/prediction#eprescription',
-      color: 'primary',
+      color: 'accent',
     },
     {
       icon: '📊',
@@ -30,7 +30,7 @@ const Home = () => {
       title: 'Analytics',
       description: 'Analyze resistance data and generate comprehensive reports for research.',
       link: '/surveillance#charts',
-      color: 'accent',
+      color: 'primary',
     },
   ]
 

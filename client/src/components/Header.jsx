@@ -57,7 +57,11 @@ const Header = () => {
             className="flex items-center gap-2 text-xl font-bold text-primary-600 hover:text-primary-700 transition-colors"
             aria-label="AMR Prediction Home"
           >
-            <span className="text-2xl" aria-hidden="true">🧬</span>
+            <img
+              src="/src/pathoshield_logo.png"
+              alt="PathoShield Logo"
+              className="w-10 h-10 object-contain"
+            />
             <span>PathoShield</span>
           </Link>
 

@@ -33,7 +33,11 @@ const PrescriptionSummary = ({ prescription, onClose, onPrint }) => {
           {/* Header Section with Logo */}
           <div className="border-b-2 border-neutral-300 pb-4 print:pb-3 print:mb-4 print:border-neutral-400">
             <div className="flex items-center gap-3 mb-3 print:mb-2">
-              <span className="text-4xl print:text-3xl">🧬</span>
+              <span className="text-4xl print:text-3xl"><img
+                src="/src/pathoshield_logo.png"
+                alt="PathoShield Logo"
+                className="w-16 h-16 object-contain"
+              /></span>
               <div>
                 <h3 className="text-2xl font-bold text-primary-600 print:text-xl print:text-primary-600">PathoShield</h3>
                 <p className="text-sm text-neutral-600 print:text-xs print:text-neutral-600">AMR Prediction & E-Prescription System</p>
