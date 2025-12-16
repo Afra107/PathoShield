@@ -6,6 +6,8 @@ import AntibioticSuggestionList from '../components/AntibioticSuggestionList'
 import PrescriptionForm from '../components/PrescriptionForm'
 import PrescriptionSummary from '../components/PrescriptionSummary'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+
 const EPrescription = () => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -19,6 +21,7 @@ const EPrescription = () => {
   const [instructions, setInstructions] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [prescription, setPrescription] = useState(null)
+  const [error, setError] = useState(null)
 
   // If no prediction data, show error or redirect
   useEffect(() => {
@@ -38,29 +41,54 @@ const EPrescription = () => {
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    setIsSubmitting(true)
-
-    // Generate prescription
-    const prescriptionData = {
-      prescriptionId: `PRES-${Date.now()}`,
-      patientId: predictionData?.patientId || 'PAT-00001',
-      date: new Date().toISOString(),
-      bacterialSpecies: predictionData?.bacterialSpecies || 'Unknown',
-      region: predictionData?.region || null,
-      antibiotic: selectedAntibiotic,
-      dosage: dosage,
-      duration: duration,
-      instructions: instructions || null,
-      confidence: predictionData?.confidence || null,
+    
+    if (!predictionData) {
+      setError('Prediction data is missing')
+      return
     }
+    
+    setIsSubmitting(true)
+    setError(null)
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // Prepare prescription payload
+      const payload = {
+        patientId: predictionData.patientId,
+        bacterialSpecies: predictionData.bacterialSpecies,
+        region: predictionData.region || null,
+        antibiotic: selectedAntibiotic,
+        dosage: dosage,
+        duration: duration,
+        instructions: instructions || null,
+        confidence: predictionData.confidence || null,
+      }
+      
+      // Call backend API
+      const response = await fetch(`${API_URL}/api/eprescription`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ detail: 'Failed to create prescription' }))
+        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`)
+      }
+      
+      const prescriptionData = await response.json()
+      // Convert date string to ISO string format for PrescriptionSummary component
+      prescriptionData.date = prescriptionData.date
       setPrescription(prescriptionData)
+    } catch (err) {
+      console.error('Prescription creation error:', err)
+      setError(err.message || 'Failed to create prescription. Please try again.')
+    } finally {
       setIsSubmitting(false)
-    }, 500)
+    }
   }
 
   const handlePrint = () => {
@@ -170,6 +198,13 @@ const EPrescription = () => {
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
         />
+
+        {/* Error Message */}
+        {error && (
+          <Card variant="filled" padding="md" className="mt-6 bg-red-50 border-red-200">
+            <p className="text-red-700 text-sm">{error}</p>
+          </Card>
+        )}
 
         {/* Info Card */}
         <Card variant="filled" padding="md" className="mt-8">

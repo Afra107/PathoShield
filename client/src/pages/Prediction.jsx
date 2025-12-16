@@ -5,6 +5,8 @@ import Button from '../components/Button'
 import Input from '../components/Input'
 import FileDrop from '../components/FileDrop'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+
 const Prediction = () => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -20,6 +22,7 @@ const Prediction = () => {
   })
   const [isProcessing, setIsProcessing] = useState(false)
   const [predictionResults, setPredictionResults] = useState(null)
+  const [error, setError] = useState(null)
 
   // Handle scroll to anchor on mount
   useEffect(() => {
@@ -52,34 +55,56 @@ const Prediction = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setIsProcessing(true)
     
-    // Mock prediction logic - replace with actual API call
-    setTimeout(() => {
-      // Mock prediction results
-      const mockResults = {
-        bacterialSpecies: formData.organism || 'E. coli',
-        susceptibleAntibiotics: [
-          'Amoxicillin',
-          'Amoxicillin-Clavulanate',
-          'Ceftriaxone',
-          'Cefazolin',
-          'Trimethoprim-Sulfamethoxazole',
-          'Azithromycin',
-        ],
-        resistantAntibiotics: [
-          'Ciprofloxacin',
-          'Levofloxacin',
-          'Gentamicin',
-        ],
-        region: formData.region || null,
-        confidence: 87.5,
-        patientId: 'PAT-00001',
+    // Validate required fields
+    if (!formData.organism.trim()) {
+      setError('Organism is required')
+      return
+    }
+    
+    if (!selectedFile) {
+      setError('Please upload a mass spectrometry data file')
+      return
+    }
+    
+    setIsProcessing(true)
+    setError(null)
+    
+    try {
+      // Prepare FormData for multipart/form-data request
+      const formDataToSend = new FormData()
+      formDataToSend.append('file', selectedFile)
+      formDataToSend.append('organism', formData.organism)
+      if (formData.patientAge) {
+        formDataToSend.append('patientAge', formData.patientAge)
+      }
+      if (formData.patientGender) {
+        formDataToSend.append('patientGender', formData.patientGender)
+      }
+      if (formData.region) {
+        formDataToSend.append('region', formData.region)
       }
       
-      setPredictionResults(mockResults)
+      // Call backend API
+      const response = await fetch(`${API_URL}/api/prediction/run`, {
+        method: 'POST',
+        body: formDataToSend,
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ detail: 'Failed to run prediction' }))
+        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`)
+      }
+      
+      const result = await response.json()
+      setPredictionResults(result)
+    } catch (err) {
+      console.error('Prediction error:', err)
+      setError(err.message || 'Failed to run prediction. Please try again.')
+      setPredictionResults(null)
+    } finally {
       setIsProcessing(false)
-    }, 2000)
+    }
   }
 
   const handleNavigateToEPrescription = () => {
@@ -169,6 +194,13 @@ const Prediction = () => {
               </div>
             </Card>
 
+            {/* Error Message */}
+            {error && (
+              <Card variant="filled" padding="md" className="bg-red-50 border-red-200">
+                <p className="text-red-700 text-sm">{error}</p>
+              </Card>
+            )}
+
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-end">
               <Button
@@ -182,6 +214,8 @@ const Prediction = () => {
                     patientGender: '',
                     region: '',
                   })
+                  setError(null)
+                  setPredictionResults(null)
                 }}
               >
                 Clear Form
