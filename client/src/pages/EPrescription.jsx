@@ -181,6 +181,7 @@ const EPrescription = () => {
           <AntibioticSuggestionList
             susceptibleAntibiotics={susceptibleAntibiotics || []}
             resistantAntibiotics={resistantAntibiotics || []}
+            antibioticDetails={predictionData?.antibioticDetails || []}
             onSelectAntibiotic={handleSelectAntibiotic}
             selectedAntibiotic={selectedAntibiotic}
           />

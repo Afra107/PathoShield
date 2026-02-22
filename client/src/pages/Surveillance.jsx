@@ -33,7 +33,10 @@ const Surveillance = () => {
           throw new Error('Failed to fetch surveillance data')
         }
         const data = await response.json()
-        setRegionData(data.regions || data || [])
+        console.log('Surveillance API response:', data)
+        const regions = data.regions || data || []
+        console.log('Setting region data:', regions)
+        setRegionData(regions)
       } catch (error) {
         console.error('Error fetching surveillance data:', error)
         // Fallback to empty array on error

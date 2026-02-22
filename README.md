@@ -56,25 +56,29 @@ FYP_Project/
 - Docker and Docker Compose installed
 - (Optional) Node.js 18+ and Python 3.10+ for local development
 
-### Running with Docker (Recommended)
+### Running with Docker (Recommended – one command for frontend, backend, and MongoDB)
 
-1. **Clone and navigate to the project:**
+1. **Clone and navigate to the project root:**
    ```bash
-   cd FYP_Project
+   cd PathoShield
    ```
 
-2. **Set up environment variables:**
+2. **Set up environment variables (used by all services):**
    ```bash
    cp env.example .env
    ```
-   Edit `.env` and update the values as needed (especially `SECRET_KEY` for production).
+   Edit `.env` and update the values as needed (especially `MONGODB_URI` and `SECRET_KEY` for production).
 
-3. **Build and start all services:**
+3. **Build and start all services (MongoDB, FastAPI backend, React frontend) with a single command:**
    ```bash
    docker-compose up --build
    ```
+   This will:
+   - Start **MongoDB** on port **27017**
+   - Start the **FastAPI backend** on port **8000**
+   - Start the **React frontend** on port **5173**
 
-4. **Access the application:**
+4. **Access the application in your browser:**
    - Frontend: http://localhost:5173
    - Backend API: http://localhost:8000
    - API Docs: http://localhost:8000/docs
@@ -167,8 +171,15 @@ Open http://localhost:5173 in your browser. The status card should show "Backend
 - `GET /health` - Check backend and database status
 
 ### Predictions
-- `GET /api/predictions` - Get all predictions
-- `POST /api/predictions` - Create a new prediction
+- `POST /api/prediction/run` - Run AMR prediction (requires MALDI-TOF spectrum file + organism name)
+  - Input: Multipart form data with:
+    - `file`: Mass spectrometry data file (6000-dim spectrum, CSV or text format)
+    - `organism`: Bacterial species name (e.g., "E. coli", "S. aureus")
+    - `patientAge`: (Optional) Patient age
+    - `patientGender`: (Optional) Patient gender
+    - `region`: (Optional) Geographic region
+  - Output: Prediction results with susceptible/resistant antibiotics and confidence score
+  - Uses Hugging Face deployed model: https://hasaan77-amr-prediction.hf.space/
 
 ### Surveillance
 - `GET /api/surveillance` - Get surveillance data
@@ -189,6 +200,7 @@ Copy `env.example` to `.env` and configure:
 - `MONGODB_URI`: MongoDB connection string (default: `mongodb://mongodb:27017/`)
 - `DB_NAME`: Database name (default: `amr_db`)
 - `MODEL_PATH`: Path to ML model files (default: `/app/models`)
+- `HF_API_URL`: Hugging Face model API URL (default: `https://hasaan77-amr-prediction.hf.space`)
 - `SECRET_KEY`: Secret key for security (change in production!)
 - `VITE_API_URL`: Frontend API URL (default: `http://localhost:8000`)
 
@@ -251,9 +263,41 @@ docker-compose logs -f server
 ### Backend Features
 - RESTful API with FastAPI
 - MongoDB integration for data persistence
+- **Real ML model integration** via Hugging Face Space API
+- AMR prediction using MALDI-TOF mass spectrometry data (6000-dim spectrum)
+- Supports 4 bacterial species: E. coli, K. pneumoniae, S. aureus, P. aeruginosa
+- Bayesian uncertainty estimation for predictions
 - Health check endpoints
 - CORS configuration for frontend communication
-- Mock data endpoints for development/testing
+
+## Model Integration
+
+The application uses a deep learning model deployed on Hugging Face Spaces for AMR prediction:
+
+- **Model API**: https://hasaan77-amr-prediction.hf.space/
+- **Input**: MALDI-TOF mass spectrum (6000 float values) + bacterial species name
+- **Output**: Per-antibiotic susceptibility predictions with Bayesian uncertainty
+- **Supported Species**: 
+  - Escherichia coli
+  - Klebsiella pneumoniae
+  - Staphylococcus aureus
+  - Pseudomonas aeruginosa
+
+The model uses:
+- Deterministic head for main resistance probability predictions
+- Bayesian head with Monte Carlo sampling for uncertainty estimation
+- PubChem fingerprints for antibiotic representation
+
+### File Format
+
+The uploaded spectrum file should contain **exactly 6000 float values** in one of these formats:
+- **CSV**: Comma-separated values (single row or multiple rows)
+- **Text**: Space, tab, or newline-separated values
+
+Example:
+```
+0.123, 0.456, 0.789, ... (6000 values total)
+```
 
 ## Notes
 
@@ -263,4 +307,5 @@ docker-compose logs -f server
 - Health checks are configured for MongoDB and server services
 - E-Prescription print layout is optimized for single-page A4 printing
 - The surveillance dashboard uses Leaflet maps and Recharts for data visualization
+- The model API requires internet connectivity to access Hugging Face Spaces
 

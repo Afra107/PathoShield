@@ -248,45 +248,92 @@ const Prediction = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-neutral-600 mb-2">Susceptible Antibiotics</p>
-                  <div className="flex flex-wrap gap-2">
-                    {predictionResults.susceptibleAntibiotics.map((ab) => (
-                      <span
-                        key={ab}
-                        className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full"
-                      >
-                        {ab}
-                      </span>
-                    ))}
+                  <div className="space-y-2">
+                    {predictionResults.susceptibleAntibiotics.map((ab) => {
+                      const detail = predictionResults.antibioticDetails?.find(d => d.name === ab)
+                      const confidence = detail?.confidence || 0
+                      return (
+                        <div key={ab} className="flex items-center justify-between bg-green-50 rounded-lg p-2 border border-green-200">
+                          <span className="text-sm font-medium text-green-700">{ab}</span>
+                          {detail && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-green-600">
+                                {confidence.toFixed(0)}% confidence
+                              </span>
+                              <div className="w-16 h-1.5 bg-green-200 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-green-600 transition-all"
+                                  style={{ width: `${confidence}%` }}
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
                 <div>
                   <p className="text-sm text-neutral-600 mb-2">Resistant Antibiotics</p>
-                  <div className="flex flex-wrap gap-2">
-                    {predictionResults.resistantAntibiotics.map((ab) => (
-                      <span
-                        key={ab}
-                        className="px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded-full"
-                      >
-                        {ab}
-                      </span>
-                    ))}
+                  <div className="space-y-2">
+                    {predictionResults.resistantAntibiotics.map((ab) => {
+                      const detail = predictionResults.antibioticDetails?.find(d => d.name === ab)
+                      const confidence = detail?.confidence || 0
+                      return (
+                        <div key={ab} className="flex items-center justify-between bg-red-50 rounded-lg p-2 border border-red-200">
+                          <span className="text-sm font-medium text-red-700">{ab}</span>
+                          {detail && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-red-600">
+                                {confidence.toFixed(0)}% confidence
+                              </span>
+                              <div className="w-16 h-1.5 bg-red-200 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-red-600 transition-all"
+                                  style={{ width: `${confidence}%` }}
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               </div>
               {predictionResults.confidence && (
                 <div>
-                  <p className="text-sm text-neutral-600 mb-1">Prediction Confidence</p>
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-sm text-neutral-600">Overall Model Confidence</p>
+                    <div className="group relative">
+                      <svg className="w-4 h-4 text-neutral-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                      </svg>
+                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-2 bg-neutral-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                        Overall confidence is calculated from the average uncertainty across all antibiotic predictions. Higher confidence (lower uncertainty) indicates more reliable predictions.
+                      </div>
+                    </div>
+                  </div>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 bg-neutral-200 rounded-full h-2">
                       <div
-                        className="bg-primary-600 h-2 rounded-full"
+                        className={`h-2 rounded-full transition-all ${
+                          predictionResults.confidence >= 80 ? 'bg-green-600' :
+                          predictionResults.confidence >= 60 ? 'bg-yellow-600' : 'bg-orange-600'
+                        }`}
                         style={{ width: `${predictionResults.confidence}%` }}
                       />
                     </div>
-                    <span className="text-sm font-semibold text-neutral-700">
+                    <span className={`text-sm font-semibold min-w-[3rem] text-right ${
+                      predictionResults.confidence >= 80 ? 'text-green-700' :
+                      predictionResults.confidence >= 60 ? 'text-yellow-700' : 'text-orange-700'
+                    }`}>
                       {predictionResults.confidence}%
                     </span>
                   </div>
+                  <p className="text-xs text-neutral-500 mt-1">
+                    Based on Bayesian uncertainty estimation across {predictionResults.antibioticDetails?.length || 0} antibiotics
+                  </p>
                 </div>
               )}
             </div>

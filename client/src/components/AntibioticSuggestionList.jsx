@@ -4,6 +4,7 @@ import Card from './Card'
 const AntibioticSuggestionList = ({ 
   susceptibleAntibiotics = [], 
   resistantAntibiotics = [],
+  antibioticDetails = [], // Array of {name, confidence, uncertainty, prediction}
   onSelectAntibiotic,
   selectedAntibiotic 
 }) => {
@@ -93,36 +94,67 @@ const AntibioticSuggestionList = ({
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {sortedSusceptible.map((antibiotic) => (
-              <Card
-                key={antibiotic}
-                variant={selectedAntibiotic === antibiotic ? 'elevated' : 'outlined'}
-                padding="md"
-                onClick={() => onSelectAntibiotic(antibiotic)}
-                className={`cursor-pointer transition-all ${
-                  selectedAntibiotic === antibiotic
-                    ? 'ring-2 ring-primary-500 border-primary-500'
-                    : 'hover:border-primary-300'
-                }`}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-neutral-900 mb-2">{antibiotic}</h4>
-                    <div className="flex flex-wrap gap-1.5 mb-2">
-                      {getAntibioticBadge(antibiotic)}
+            {sortedSusceptible.map((antibiotic) => {
+              const detail = antibioticDetails.find(d => d.name === antibiotic)
+              const confidence = detail?.confidence || 0
+              const uncertainty = detail?.uncertainty || 0
+              
+              return (
+                <Card
+                  key={antibiotic}
+                  variant={selectedAntibiotic === antibiotic ? 'elevated' : 'outlined'}
+                  padding="md"
+                  onClick={() => onSelectAntibiotic(antibiotic)}
+                  className={`cursor-pointer transition-all ${
+                    selectedAntibiotic === antibiotic
+                      ? 'ring-2 ring-primary-500 border-primary-500'
+                      : 'hover:border-primary-300'
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-neutral-900 mb-2">{antibiotic}</h4>
+                      <div className="flex flex-wrap gap-1.5 mb-2">
+                        {getAntibioticBadge(antibiotic)}
+                      </div>
+                      <p className="text-xs text-green-600 font-medium mb-2">✓ Susceptible</p>
+                      {detail && (
+                        <div className="mt-2 space-y-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-neutral-600">Model Confidence:</span>
+                            <span className={`font-semibold ${
+                              confidence >= 80 ? 'text-green-600' :
+                              confidence >= 60 ? 'text-yellow-600' : 'text-orange-600'
+                            }`}>
+                              {confidence.toFixed(0)}%
+                            </span>
+                          </div>
+                          <div className="w-full h-1.5 bg-neutral-200 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full transition-all ${
+                                confidence >= 80 ? 'bg-green-500' :
+                                confidence >= 60 ? 'bg-yellow-500' : 'bg-orange-500'
+                              }`}
+                              style={{ width: `${confidence}%` }}
+                            />
+                          </div>
+                          <p className="text-xs text-neutral-500">
+                            Uncertainty: {(uncertainty * 1000).toFixed(2)}‰
+                          </p>
+                        </div>
+                      )}
                     </div>
-                    <p className="text-xs text-green-600 font-medium">✓ Susceptible</p>
+                    {selectedAntibiotic === antibiotic && (
+                      <div className="ml-2 text-primary-600">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    )}
                   </div>
-                  {selectedAntibiotic === antibiotic && (
-                    <div className="ml-2 text-primary-600">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  )}
-                </div>
-              </Card>
-            ))}
+                </Card>
+              )
+            })}
           </div>
         )}
       </div>
@@ -164,6 +196,12 @@ const AntibioticSuggestionList = ({
 AntibioticSuggestionList.propTypes = {
   susceptibleAntibiotics: PropTypes.arrayOf(PropTypes.string),
   resistantAntibiotics: PropTypes.arrayOf(PropTypes.string),
+  antibioticDetails: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string,
+    confidence: PropTypes.number,
+    uncertainty: PropTypes.number,
+    prediction: PropTypes.string,
+  })),
   onSelectAntibiotic: PropTypes.func.isRequired,
   selectedAntibiotic: PropTypes.string,
 }
