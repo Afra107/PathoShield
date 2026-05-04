@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import Dict, List, Optional
 import random
 import csv
 import io
@@ -16,6 +16,44 @@ logger = logging.getLogger(__name__)
 
 # Hugging Face API endpoint
 HF_API_URL = os.getenv("HF_API_URL", "https://hasaan77-amr-prediction.hf.space")
+
+# Hugging Face retrain endpoint (expects CSV upload)
+HF_RETRAIN_URL = os.getenv("HF_RETRAIN_URL", f"{HF_API_URL}/retrain")
+HF_API_TOKEN = os.getenv("HF_API_TOKEN")
+
+# Canonical species -> antibiotic column order for retraining labels
+SPECIES_ANTIBIOTICS: Dict[str, List[str]] = {
+    "Escherichia coli": [
+        "Ciprofloxacin",
+        "Ceftriaxone",
+        "Meropenem",
+        "Piperacillin",
+    ],
+    "Klebsiella pneumoniae": [
+        "Ciprofloxacin",
+        "Ceftriaxone",
+        "Meropenem",
+        "Gentamicin",
+        "Piperacillin",
+    ],
+    "Staphylococcus aureus": [
+        "Oxacillin",
+        "Clindamycin",
+        "Fusidic acid",
+    ],
+    "Pseudomonas aeruginosa": [
+        "Ciprofloxacin",
+        "Meropenem",
+        "Piperacillin",
+        "Tobramycin",
+        "Imipenem",
+    ],
+}
+
+# Label encoding for retraining CSV
+# 1 = Resistant, 0 = Susceptible
+RESISTANT_LABEL_VALUE = 1
+SUSCEPTIBLE_LABEL_VALUE = 0
 
 # Mapping from common organism names to HF API format
 ORGANISM_MAPPING = {
@@ -162,6 +200,30 @@ def normalize_organism_name(organism: str) -> str:
     """Map common organism names to HF API format."""
     organism_lower = organism.strip().lower()
     return ORGANISM_MAPPING.get(organism_lower, organism.strip())
+
+
+def labels_from_prediction_result(species: str, result: PredictionResult) -> Optional[Dict[str, int]]:
+    """
+    Build a stable antibiotic->0/1 label mapping for a known species.
+
+    Only returns labels for species present in SPECIES_ANTIBIOTICS.
+    """
+    antibiotics = SPECIES_ANTIBIOTICS.get(species)
+    if not antibiotics:
+        return None
+
+    prediction_by_name: Dict[str, str] = {d.name: d.prediction for d in result.antibioticDetails}
+    labels: Dict[str, int] = {}
+    for ab in antibiotics:
+        pred = prediction_by_name.get(ab)
+        if pred == "Resistant":
+            labels[ab] = RESISTANT_LABEL_VALUE
+        elif pred == "Susceptible":
+            labels[ab] = SUSCEPTIBLE_LABEL_VALUE
+        else:
+            # If model didn't return this antibiotic (unexpected), skip storing as a training sample
+            return None
+    return labels
 
 
 async def call_hf_api(spectrum: List[float], bacteria_name: str) -> dict:
@@ -332,18 +394,24 @@ async def run_prediction(
     if db is not None:
         try:
             # Store the original HF API response in the exact format received
+            normalized_species_for_storage = normalized_organism
+            labels = labels_from_prediction_result(normalized_species_for_storage, result)
             hf_prediction_doc = {
                 "bacteria_name": hf_response.get("bacteria_name", normalized_organism),
                 "resistance_threshold": hf_response.get("resistance_threshold", 0.5),
                 "results": hf_response.get("results", []),  # Store exact HF format
                 # Also store transformed data for easy querying
                 "bacterialSpecies": result.bacterialSpecies,
+                "normalized_species": normalized_species_for_storage,
                 "susceptibleAntibiotics": result.susceptibleAntibiotics,
                 "resistantAntibiotics": result.resistantAntibiotics,
                 "antibioticDetails": [detail.model_dump() for detail in result.antibioticDetails],
                 "confidence": result.confidence,
                 "patientId": result.patientId,
                 "region": result.region,
+                # Store raw spectrum and 0/1 labels for periodic retraining
+                "spectrum": spectrum,
+                "labels": labels,
                 # Metadata
                 "organism_input": organism,
                 "normalized_organism": normalized_organism,
@@ -353,8 +421,21 @@ async def run_prediction(
                 "filename": file.filename,
                 "created_at": datetime.utcnow(),
             }
-            db.predictions.insert_one(hf_prediction_doc)
+            insert_result = db.predictions.insert_one(hf_prediction_doc)
             logger.info(f"Saved prediction to database with {len(hf_response.get('results', []))} antibiotic results")
+
+            # Also store in a dedicated collection for retraining datasets (per-species)
+            # This makes exporting per-species CSVs fast and consistent.
+            if labels is not None and normalized_species_for_storage in SPECIES_ANTIBIOTICS:
+                db.training_samples.insert_one(
+                    {
+                        "species": normalized_species_for_storage,
+                        "spectrum": spectrum,
+                        "labels": labels,
+                        "prediction_id": insert_result.inserted_id,
+                        "created_at": datetime.utcnow(),
+                    }
+                )
         except Exception as e:
             logger.warning(f"Failed to save prediction to database: {str(e)}")
     
